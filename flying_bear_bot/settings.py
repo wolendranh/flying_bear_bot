@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bot'
+    'bot',
+    'bot_register'
 ]
 
 MIDDLEWARE = [
@@ -120,7 +121,15 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+TELEGRAM_BOT = [{
+    'token': '{YOUR_BOT_TOKEN}',
+    'register': '',  # register method that will be called
+    'webhook': ''  # optional if you use django.sites
+}]
+
 try:
     from flying_bear_bot.project_settings import *
-except ImportError:
+
+except ImportError as e:
+    print(e)
     pass

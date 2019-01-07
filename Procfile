@@ -1,1 +1,1 @@
-web: python bot.py
+web: gunicorn flying_bear_bot.wsgi --log-file -
