@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 # Pycharm, Visual Studio Code
-.idea/
+.idea/*
 .vscode/
 
 

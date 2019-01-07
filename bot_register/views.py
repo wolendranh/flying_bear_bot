@@ -60,7 +60,7 @@ class TelegramView(generic.View):
     def head(self, request):
         return HttpResponse()
 
-    def post(self, request, token, *args,):
+    def post(self, request, token, *args):
         dispatcher = self.get_dispatcher(token)
         if not dispatcher:
             return Http404()

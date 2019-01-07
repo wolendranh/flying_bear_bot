@@ -2,8 +2,10 @@
 from django.contrib import admin
 from bot.models import Quote, StopWord
 
+
 class QuoteAdmin(admin.ModelAdmin):
     pass
+
 
 class StopWordAdmin(admin.ModelAdmin):
     pass
