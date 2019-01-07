@@ -127,8 +127,16 @@ TELEGRAM_BOT = [{
     'webhook': ''  # optional if you use django.sites
 }]
 
+
+if os.environ.get('HEROKU'):
+    # Configure Django App for Heroku.
+    import django_heroku
+
+    django_heroku.settings(locals())
+
+
 try:
-    from flying_bear_bot.project_settings import *
+    from flying_bear_bot.local_settings import *
 
 except ImportError as e:
     print(e)
