@@ -15,24 +15,27 @@ HEROKU = env('HEROKU')
 ALLOWED_HOSTS = ['*']
 
 if HEROKU:
-    STATIC_URL = '/static/'
+    # Configure Django App for Heroku.
+    import django_heroku
 
-    import dj_database_url
-    # Parse database configuration from $DATABASE_URL
-    DATABASES = {
-        'default': dj_database_url.config()
-    }
-
-    # Honor the 'X-Forwarded-Proto' header for request.is_secure()
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-    # Static asset configuration
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    STATIC_ROOT = 'staticfiles'
-
-    STATICFILES_DIRS = (
-        os.path.join(BASE_DIR, 'static'),
-)
+    django_heroku.settings(locals())
+    # STATIC_URL = '/static/'
+    #
+    # import dj_database_url
+    # # Parse database configuration from $DATABASE_URL
+    # DATABASES = {
+    #     'default': dj_database_url.config()
+    # }
+    #
+    # # Honor the 'X-Forwarded-Proto' header for request.is_secure()
+    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    #
+    # # Static asset configuration
+    # BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    # STATIC_ROOT = 'staticfiles'
+    #
+    # STATICFILES_DIRS = (
+    #     os.path.join(BASE_DIR, 'static'),
 else:
     DATABASES = {
         'default': {
