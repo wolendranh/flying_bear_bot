@@ -3,7 +3,6 @@ import logging
 from collections import defaultdict
 
 from django.conf import settings
-from django.conf.urls import url
 from django.http import HttpResponse
 from django.http.response import Http404
 from django.urls import reverse

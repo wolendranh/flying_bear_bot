@@ -134,6 +134,11 @@ if os.environ.get('HEROKU'):
 
     django_heroku.settings(locals())
 
+    TELEGRAM_BOT = [{
+        'token': os.environ.get('TOKEN'),
+        'register': 'bot.dispatchers.register',
+        'webhook': os.environ.get('WEB_HOOK_URL')
+    }]
 
 try:
     from flying_bear_bot.local_settings import *
