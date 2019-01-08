@@ -35,7 +35,7 @@ def quote(bot: Bot, update: Update):
 
 def random_by_stop_word(bot: Bot, update: Update):
     quote = get_random_quote_by_stop_word(message_text=update.message.text) 
-    bot.send_message(chat_id=update.message.chat_id, text=quote)
+    bot.send_message(chat_id=update.message.chat_id, text=quote, parse_mode='HTML')
 
 
 def random(bot: Bot, update: Update):
