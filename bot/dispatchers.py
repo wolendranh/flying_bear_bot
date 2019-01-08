@@ -22,13 +22,13 @@ def error(bot: Bot, update: Update):
 def quote(bot: Bot, update: Update):
     try:
         text, author = update.message.reply_to_message.text, update.message.reply_to_message.from_user.full_name
-        stripped_stop_word = update.message.text.replace('/keyword', '').strip()
+        stripped_stop_word = update.message.text.replace('/store', '').strip()
         if stripped_stop_word:
             store_quote(text=text, author=author, stop_word_text=stripped_stop_word)
             bot.sendMessage(update.message.chat_id, text='I stored your quote from {}!'.format(author))
         else:
             bot.sendMessage(update.message.chat_id,
-                            text='Stop word missing. Please provide stop word text after `/keyword` command! Thanks!')
+                            text='Stop word missing. Please provide stop word text after `/store` command! Thanks!')
     except Exception as e:
         logger.exception('Failed to store quote. Error', exc_info=e)
         
@@ -47,9 +47,10 @@ def register(dispatcher: Dispatcher):
     this method will be called on start of application
     and register bot callbacks
     """
-    dispatcher.add_handler(CommandHandler("keyword", quote))
+    dispatcher.add_handler(CommandHandler("store", quote))
     dispatcher.add_handler(CommandHandler("random", random))
     dispatcher.add_handler(CommandHandler("help", help))
+    dispatcher.add_handler(CommandHandler("keyword", random_by_stop_word))
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
     # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)
