@@ -10,5 +10,6 @@ class QuoteAdmin(admin.ModelAdmin):
 class StopWordAdmin(admin.ModelAdmin):
     pass
 
+
 admin.site.register(Quote, QuoteAdmin)
 admin.site.register(StopWord, StopWordAdmin)

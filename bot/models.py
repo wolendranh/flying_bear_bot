@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+
 class StopWord(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -8,6 +9,7 @@ class StopWord(models.Model):
 
     def __str__ (self):
         return self.text
+
 
 class Quote(models.Model):
     text = models.CharField(max_length=400)

@@ -1,24 +1,25 @@
 import logging
 
 from telegram.ext import CommandHandler, Filters, MessageHandler, Dispatcher
-from telegram import Bot
+from telegram import Bot, Update
 
 from .services import get_random_quote_by_stop_word, get_random_quote, store_quote
 
 logger = logging.getLogger(__name__)
 
 
-def help(bot: Bot, update: dict):
+def help(bot: Bot, update: Update):
     bot.sendMessage(update.message.chat_id, text="""
                          - reply message and add /keyword after with stop word to create stop word -> quote relation. \n- /random - show random quote                            
                          """
                     )
 
 
-def error(bot: Bot, update: dict):
+def error(bot: Bot, update: Update):
     bot.sendMessage(update.message.chat_id, text='Command not found .')
 
-def quote(bot: Bot, update: dict):
+
+def quote(bot: Bot, update: Update):
     try:
         text, author = update.message.reply_to_message.text, update.message.reply_to_message.from_user.full_name
         stripped_stop_word = update.message.text.replace('/keyword', '').strip()
@@ -32,12 +33,12 @@ def quote(bot: Bot, update: dict):
         logger.exception('Failed to store quote. Error', exc_info=e)
         
 
-def random_by_stop_word(bot: Bot, update: dict):
+def random_by_stop_word(bot: Bot, update: Update):
     quote = get_random_quote_by_stop_word(message_text=update.message.text) 
     bot.send_message(chat_id=update.message.chat_id, text=quote)
 
 
-def random(bot: Bot, update: dict):
+def random(bot: Bot, update: Update):
     bot.send_message(chat_id=update.message.chat_id, text=get_random_quote(), parse_mode='HTML')
 
 
@@ -50,5 +51,6 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler("random", random))
     dispatcher.add_handler(CommandHandler("help", help))
 
-    dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)
+    # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
+    # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)
     dispatcher.add_error_handler(error)

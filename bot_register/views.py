@@ -16,7 +16,6 @@ from telegram.ext import Dispatcher
 logger = logging.getLogger(__name__)
 
 
-
 @method_decorator(csrf_exempt, name='dispatch')
 class TelegramView(generic.View):
     bots = defaultdict()
