@@ -11,6 +11,7 @@ class StopWord(models.Model):
 
 class Quote(models.Model):
     text = models.CharField(max_length=400)
+    author = models.CharField(blank=True, null=True, max_length=100)
     stop_word = models.ForeignKey(StopWord, related_name='quotes', on_delete=models.CASCADE)
 
     def __str__ (self):
