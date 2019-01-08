@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bot'
+    'bot',
+    'bot_register'
 ]
 
 MIDDLEWARE = [
@@ -120,7 +121,21 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
+if os.environ.get('HEROKU'):
+    # Configure Django App for Heroku.
+    import django_heroku
+
+    django_heroku.settings(locals())
+
+    TELEGRAM_BOT = [{
+        'token': os.environ.get('TOKEN'),
+        'register': 'bot.dispatchers.register',
+        'webhook': os.environ.get('WEB_HOOK_URL')
+    }]
+
 try:
-    from flying_bear_bot.project_settings import *
-except ImportError:
+    from flying_bear_bot.local_settings import *
+
+except ImportError as e:
     pass

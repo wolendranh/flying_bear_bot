@@ -6,8 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
-# Pycharm
+# Pycharm, Visual Studio Code
 .idea/
+.vscode/
+
 
 # env files
 .env
