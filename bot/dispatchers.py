@@ -47,10 +47,10 @@ def register(dispatcher: Dispatcher):
     this method will be called on start of application
     and register bot callbacks
     """
-    dispatcher.add_handler(CommandHandler("store", quote))
-    dispatcher.add_handler(CommandHandler("random", random))
+    dispatcher.add_handler(CommandHandler(["store", "s"], quote))
+    dispatcher.add_handler(CommandHandler(["random", "r"], random))
     dispatcher.add_handler(CommandHandler("help", help))
-    dispatcher.add_handler(CommandHandler("keyword", random_by_stop_word))
+    dispatcher.add_handler(CommandHandler(["keyword", "k"], random_by_stop_word))
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
     # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)
