@@ -3,7 +3,10 @@ import logging
 from telegram.ext import CommandHandler, Filters, MessageHandler, Dispatcher
 from telegram import Bot, Update
 
-from .services import get_random_quote_by_stop_word, get_random_quote, store_quote
+from .services import (
+    get_random_quote_by_stop_word, get_random_quote, store_quote,
+    format_quote, get_random_response_quote, log_quote
+)
 
 logger = logging.getLogger(__name__)
 
@@ -35,11 +38,17 @@ def quote(bot: Bot, update: Update):
 
 def random_by_stop_word(bot: Bot, update: Update):
     quote = get_random_quote_by_stop_word(message_text=update.message.text) 
-    bot.send_message(chat_id=update.message.chat_id, text=quote, parse_mode='HTML')
+    bot.send_message(chat_id=update.message.chat_id, text=format_quote(quote), parse_mode='HTML')
 
 
 def random(bot: Bot, update: Update):
-    bot.send_message(chat_id=update.message.chat_id, text=get_random_quote(), parse_mode='HTML')
+    quote = get_random_quote()
+    bot.send_message(chat_id=update.message.chat_id, text=format_quote(quote), parse_mode='HTML')
+
+def interval_quote(bot: Bot, update: Update):
+    quote = get_random_response_quote(message_text=update.message.text)
+    bot.send_message(chat_id=update.message.chat_id, text=format_quote(quote), parse_mode='HTML')
+    log_quote(quote)
 
 
 def register(dispatcher: Dispatcher):
@@ -53,5 +62,5 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler(["keyword", "k"], random_by_stop_word))
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
-    # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)
+    dispatcher.add_handler(MessageHandler(Filters.text, get_random_response_quote), group=1)
     dispatcher.add_error_handler(error)

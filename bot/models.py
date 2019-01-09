@@ -21,3 +21,8 @@ class Quote(models.Model):
     
     class Meta:
         unique_together = (("text", "stop_word"),)
+
+class QuoteLog(models.Model):
+    quote = models.ForeignKey(Quote, on_delete=models.CASCADE, related_name='logs')
+    published_at = models.DateTimeField(auto_now_add=True)
+    quote_of_the_day_at = models.DateTimeField(null=True, blank=True)
