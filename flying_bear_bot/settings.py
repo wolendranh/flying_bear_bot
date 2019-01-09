@@ -125,6 +125,10 @@ STATIC_URL = '/static/'
 if os.environ.get('HEROKU'):
     # Configure Django App for Heroku.
     import django_heroku
+    import sentry_sdk
+
+    # init sentry for HEROKU
+    sentry_sdk.init(os.environ.get('SENTRY_URL'))
 
     django_heroku.settings(locals())
 
