@@ -23,3 +23,8 @@ def get_random_quote():
 
 def format_quote(quote):
     return "<i>{}</i>.\n{}".format(quote.text, quote.author or 'Unknown')
+
+
+def get_keyword_quote_count(keyword: str) -> str:
+    count = Quote.objects.filter(stop_word__text=keyword).count()
+    return "<i>'{}'</i> - {} quotes.".format(keyword, count)
