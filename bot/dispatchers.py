@@ -1,10 +1,11 @@
+import re
 import logging
 import re
 
 from telegram.ext import CommandHandler, Filters, MessageHandler, Dispatcher
 from telegram import Bot, Update
 
-from .services import get_random_quote_by_stop_word, get_random_quote, store_quote
+from .services import get_random_quote_by_stop_word, get_random_quote, store_quote, get_keyword_quote_count
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,15 @@ def random(bot: Bot, update: Update):
     bot.send_message(chat_id=update.message.chat_id, text=get_random_quote(), parse_mode='HTML')
 
 
+def quote_count_by_keyword(bot: Bot, update: Update):
+    try:
+        keyword = re.sub(r'/[count|c]+', "", update.message.text).strip()
+        message = get_keyword_quote_count(keyword=keyword)
+        bot.send_message(chat_id=update.message.chat_id, text=message, parse_mode='HTML')
+    except Exception as e:
+        logger.exception('Failed to get count for keyword.', exc_info=e)
+
+
 def register(dispatcher: Dispatcher):
     """
     this method will be called on start of application
@@ -52,6 +62,7 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler(["random", "r"], random))
     dispatcher.add_handler(CommandHandler("help", help))
     dispatcher.add_handler(CommandHandler(["keyword", "k"], random_by_stop_word))
+    dispatcher.add_handler(CommandHandler(["count", "c"], quote_count_by_keyword))
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
     # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)
