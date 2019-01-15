@@ -1,4 +1,5 @@
 import logging
+import re
 
 from telegram.ext import CommandHandler, Filters, MessageHandler, Dispatcher
 from telegram import Bot, Update
@@ -22,7 +23,7 @@ def error(bot: Bot, update: Update):
 def quote(bot: Bot, update: Update):
     try:
         text, author = update.message.reply_to_message.text, update.message.reply_to_message.from_user.full_name
-        stripped_stop_word = update.message.text.replace('/store', '').strip()
+        stripped_stop_word = re.sub(r'/[store|s]+', '', update.message.text).strip()
         if stripped_stop_word:
             store_quote(text=text, author=author, stop_word_text=stripped_stop_word)
             bot.sendMessage(update.message.chat_id, text='I stored your quote from {}!'.format(author))
