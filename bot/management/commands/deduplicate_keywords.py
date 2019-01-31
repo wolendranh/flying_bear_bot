@@ -65,6 +65,7 @@ class Command(BaseCommand):
                         self.stdout.write(self.style.WARNING('Duplicated keyword {} would be removed"'.format(
                             duplicate.text)
                         ))
+                        duplicates_removed += 1
 
         self.stdout.write(self.style.SUCCESS('Duplicates removed {}, quotes moved {}, quotes deleted {}' .format(
             duplicates_removed, quotes_moved, quotes_deleted
