@@ -49,7 +49,7 @@ class TelegramView(generic.View):
 
     @classmethod
     def as_view(cls, **initkwargs):
-        cls.register_webhooks()
+        # cls.register_webhooks()
         return super().as_view(**initkwargs)
 
     def get(self, request):
