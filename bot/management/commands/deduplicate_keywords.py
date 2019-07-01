@@ -30,9 +30,7 @@ class Command(BaseCommand):
                     'For text {} there are duplicates {}"'.format(text, [s.id for s in duplicates]))
                 )
 
-        duplicates_removed = 0
-        quotes_moved = 0
-        quotes_deleted = 0
+        duplicates_removed, quotes_moved, quotes_deleted = 0, 0, 0
 
         for text, duplicates in counter_map.items():
 
