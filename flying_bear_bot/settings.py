@@ -142,6 +142,9 @@ if os.environ.get('HEROKU'):
         'webhook': os.environ.get('WEB_HOOK_URL')
     }]
 
+    TWITCH_CLIENT_SECRET = os.environ.get('TWITCH_CLIENT_SECRET')
+    TWITCH_CLIENT_ID = os.environ.get('TWITCH_CLIENT_ID')
+
 try:
     from flying_bear_bot.local_settings import *
 
