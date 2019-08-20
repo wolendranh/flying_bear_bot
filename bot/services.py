@@ -1,30 +1,64 @@
+import html
 import random
-from .models import StopWord, Quote
+
+from twitch.client import TwitchClient
+from .models import Tag, Quote
 
 
-def store_quote(author, text, stop_word_text):
-    stop_word, _ = StopWord.objects.get_or_create(text=stop_word_text)
-    return Quote.objects.create(text=text, stop_word=stop_word, author=author)
+def store_quote(author: str, text: str, tag_text: str):
+    tag, _ = Tag.objects.get_or_create(text=tag_text)
+    return Quote.objects.create(text=text, tag=tag, author=author)
 
 
-def get_random_quote_by_stop_word(message_text):
-    stop_word = StopWord.objects.filter(text__in=message_text.split()).first()
-    if stop_word:
-        quote = random.choice(stop_word.quotes.all())
+def get_random_quote_by_tag(message_text: str) -> str:
+    tag = Tag.objects.filter(text__in=message_text.split()).first()
+    if tag:
+        quote = random.choice(tag.quotes.all())
         return format_quote(quote=quote)
     else:
-        raise StopWord.DoesNotExist
+        raise Tag.DoesNotExist
 
 
-def get_random_quote():
+def get_random_quote() -> str:
     quote = random.choice(Quote.objects.all())
     return format_quote(quote=quote)
 
 
-def format_quote(quote):
+def format_quote(quote: Quote) -> str:
     return "<i>{}</i>\n{}".format(quote.text, quote.author or 'Unknown')
 
 
 def get_keyword_quote_count(keyword: str) -> str:
-    count = Quote.objects.filter(stop_word__text=keyword).count()
+    count = Quote.objects.filter(tag__text=keyword).count()
     return "<i>'{}'</i> - {} quotes.".format(keyword, count)
+
+
+def format_stream(idx, stream):
+    return (
+        f'<b>- {idx} -</b> \n'
+        f'<i>{html.escape(stream["title"])}</i>\n'
+        f'\n'
+        f'<b>streamer:</b> <i>{html.escape(stream["user_name"])}</i>\n'
+        f'\n'
+        f'<b>viewers:</b> <i>{stream["viewer_count"]}</i>\n'
+        f'<a href="https://www.twitch.tv/{html.escape(stream["user_name"])}">Stream link</a>\n'
+        f'\n'
+        f'\n'
+    )
+
+
+def get_stream_list_by_game(game_name: str):
+    client = TwitchClient()
+
+    streams = client.streams_by_game(game_name=game_name)
+    raw_streams = streams['data']
+
+    # limit to 5 for now
+    if len(raw_streams) >= 5:
+        raw_streams = raw_streams[:5]
+
+    parsed_streams = []
+    for idx, stream in enumerate(raw_streams):
+        parsed_streams.append(format_stream(idx, stream))
+
+    return ' '.join(parsed_streams)

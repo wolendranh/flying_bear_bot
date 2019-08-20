@@ -2,7 +2,7 @@
 from django.db import models
 
 
-class StopWord(models.Model):
+class Tag(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     text = models.CharField(max_length=200)
@@ -14,10 +14,10 @@ class StopWord(models.Model):
 class Quote(models.Model):
     text = models.CharField(max_length=400)
     author = models.CharField(blank=True, null=True, max_length=100)
-    stop_word = models.ForeignKey(StopWord, related_name='quotes', on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, related_name='quotes', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.text
     
     class Meta:
-        unique_together = (("text", "stop_word"),)
+        unique_together = (("text", "tag"),)
