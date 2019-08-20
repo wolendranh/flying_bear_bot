@@ -14,7 +14,10 @@ logger = logging.getLogger(__name__)
 
 def help(bot: Bot, update: Update):
     bot.sendMessage(update.message.chat_id, text="""
-                         - reply message and add /keyword after with stop word to create stop word -> quote relation. \n- /random - show random quote                            
+                         reply message and add  /keyword or /k after with stop word to create stop word -> quote relation.\n 
+                         - /random or /r - show random quote \n
+                         - /count or /c - show random quote \n
+                         - /st or /stream - following game name (/st dota2) to retrieve top streams (NEW) \n                               
                          """
                     )
 
