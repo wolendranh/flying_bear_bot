@@ -3,7 +3,7 @@ from collections import defaultdict
 from django.db import IntegrityError, transaction
 from django.db.models import Count
 from django.core.management.base import BaseCommand
-from bot.models import StopWord
+from bot.models import Tag
 
 
 class Command(BaseCommand):
@@ -14,8 +14,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        duplicates = StopWord.objects.values('text').annotate(Count('id')).order_by().filter(id__count__gt=1)
-        duplicate_qs = StopWord.objects.filter(text__in=[d['text'] for d in duplicates])
+        duplicates = Tag.objects.values('text').annotate(Count('id')).order_by().filter(id__count__gt=1)
+        duplicate_qs = Tag.objects.filter(text__in=[d['text'] for d in duplicates])
 
         self.stdout.write(self.style.SUCCESS('Found {} duplicates"'.format(duplicate_qs.count())))
 
