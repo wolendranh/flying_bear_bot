@@ -20,7 +20,6 @@ def get_random_quote_by_tag(message_text: str) -> str:
         raise Tag.DoesNotExist
 
 
-def get_random_quote() -> str:
 def get_weather(city):
     response = requests.get('http://wttr.in/{0}?format=4'.format(city))
     return response.text
