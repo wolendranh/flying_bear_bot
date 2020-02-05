@@ -23,7 +23,7 @@ def error(bot: Bot, update: Update):
 
 def weather(bot: Bot, update: Update):
     try:
-        city = update.message.reply_to_message.text
+        city = re.sub(r'/[weather|w]+', '', update.message.text).strip()
         weather = get_weather(city=city)
         bot.sendMessage(update.message.chat_id, text=weather)
     except Exception as e:
@@ -71,7 +71,6 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler(["random", "r"], random))
     dispatcher.add_handler(CommandHandler("help", help))
     dispatcher.add_handler(CommandHandler(["keyword", "k"], random_by_stop_word))
-    dispatcher.add_handler(CommandHandler(["count", "c"], quote_count_by_keyword))
     dispatcher.add_handler(CommandHandler(["count", "c"], quote_count_by_keyword))
     dispatcher.add_handler(CommandHandler(["weather", "w"], weather))
 
