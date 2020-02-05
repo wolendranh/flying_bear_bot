@@ -5,7 +5,7 @@ import re
 from telegram.ext import CommandHandler, Filters, MessageHandler, Dispatcher
 from telegram import Bot, Update
 
-from .services import get_random_quote_by_stop_word, get_random_quote, store_quote, get_keyword_quote_count
+from .services import get_random_quote_by_stop_word, get_random_quote, store_quote, get_keyword_quote_count, get_weather
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +19,15 @@ def help(bot: Bot, update: Update):
 
 def error(bot: Bot, update: Update):
     bot.sendMessage(update.message.chat_id, text='Command not found .')
+
+
+def weather(bot: Bot, update: Update):
+    try:
+        city = update.message.reply_to_message.text
+        weather = get_weather(city=city)
+        bot.sendMessage(update.message.chat_id, text=weather)
+    except Exception as e:
+        logger.exception('Failed to get weather. Error', exc_info=e)
 
 
 def quote(bot: Bot, update: Update):
@@ -63,6 +72,8 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler("help", help))
     dispatcher.add_handler(CommandHandler(["keyword", "k"], random_by_stop_word))
     dispatcher.add_handler(CommandHandler(["count", "c"], quote_count_by_keyword))
+    dispatcher.add_handler(CommandHandler(["count", "c"], quote_count_by_keyword))
+    dispatcher.add_handler(CommandHandler(["weather", "w"], weather))
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
     # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)

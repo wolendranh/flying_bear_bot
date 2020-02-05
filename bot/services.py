@@ -1,5 +1,8 @@
 import random
+import requests
+
 from .models import StopWord, Quote
+
 
 
 def store_quote(author, text, stop_word_text):
@@ -14,6 +17,11 @@ def get_random_quote_by_stop_word(message_text):
         return format_quote(quote=quote)
     else:
         raise StopWord.DoesNotExist
+
+
+def get_weather(city):
+    response = requests.get('http://wttr.in/{0}'.format(city))
+    return response.text
 
 
 def get_random_quote():
