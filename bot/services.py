@@ -20,7 +20,7 @@ def get_random_quote_by_stop_word(message_text):
 
 
 def get_weather(city):
-    response = requests.get('http://wttr.in/{0}'.format(city))
+    response = requests.get('http://wttr.in/{0}?format=4'.format(city))
     return response.text
 
 
