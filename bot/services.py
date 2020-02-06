@@ -40,9 +40,9 @@ def get_location_snow_camera_screenshot(location: str):
     active_video = WebDriverWait(driver, 30).until(EC.text_to_be_present_in_element(
         (By.XPATH, "//span[contains(@class, 'fp-elapsed')]"), "00:01")
     )
-    screenshot_location = player.screenshot("/tmp/{}.png".format(location))
+    player.screenshot("/tmp/{}.png".format(location))
     driver.close()
-    return screenshot_location
+    return "/tmp/{}.png".format(location)
 
 
 def store_quote(author: str, text: str, tag_text: str):
