@@ -30,7 +30,7 @@ def snow_camera(bot: Bot, update: Update):
     location = re.sub(r'/[camera|cam]+', '', update.message.text).strip()
     try:
         screenshot_location = get_location_snow_camera_screenshot(location=location)
-        bot.send_photo(update.message.chat_id, photo=screenshot_location)
+        bot.send_photo(update.message.chat_id, photo=open(screenshot_location, 'rb'))
     except Exception:
         error(bot, update, "Not able to get snow data for location {}".format(location))
 
