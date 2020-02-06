@@ -105,7 +105,7 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler(["stream", "st"], get_streams_by_game))
 
     # snow cameras
-    dispatcher.add_error_handler(CommandHandler(["camera", "cam"], snow_camera))
+    dispatcher.add_handler(CommandHandler(["camera", "cam"], snow_camera))
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
     # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)
