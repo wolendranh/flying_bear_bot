@@ -6,7 +6,7 @@ from telegram import Bot, Update
 
 from .services import (
     get_random_quote_by_tag, get_random_quote, store_quote, get_keyword_quote_count,
-    get_stream_list_by_game, get_weather
+    get_stream_list_by_game, get_weather, get_location_snow_camera_screenshot
 )
 
 logger = logging.getLogger(__name__)
@@ -22,8 +22,17 @@ def help(bot: Bot, update: Update):
                     )
 
 
-def error(bot: Bot, update: Update):
-    bot.sendMessage(update.message.chat_id, text='Command not found .')
+def error(bot: Bot, update: Update, error_text: str = 'Command not found .'):
+    bot.sendMessage(update.message.chat_id, text=error_text)
+
+
+def snow_camera(bot: Bot, update: Update):
+    location = re.sub(r'/[camera|cam]+', '', update.message.text).strip()
+    try:
+        screenshot_location = get_location_snow_camera_screenshot(location=location)
+        bot.send_photo(update.message.chat_id, photo=screenshot_location)
+    except Exception:
+        error(bot, update, "Not able to get snow data for location {}".format(location))
 
 
 def weather(bot: Bot, update: Update):
@@ -94,6 +103,9 @@ def register(dispatcher: Dispatcher):
 
     # twitch
     dispatcher.add_handler(CommandHandler(["stream", "st"], get_streams_by_game))
+
+    # snow cameras
+    dispatcher.add_error_handler(CommandHandler(["camera", "cam"], snow_camera))
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
     # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)

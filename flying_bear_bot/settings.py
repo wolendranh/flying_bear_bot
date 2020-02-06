@@ -144,6 +144,8 @@ if os.environ.get('HEROKU'):
 
     TWITCH_CLIENT_SECRET = os.environ.get('TWITCH_CLIENT_SECRET')
     TWITCH_CLIENT_ID = os.environ.get('TWITCH_CLIENT_ID')
+    CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH')
+    GOOGLE_CHROME_BIN = os.environ.get('CHROME_DRIVER_PATH')
 
 try:
     from flying_bear_bot.local_settings import *
