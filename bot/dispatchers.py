@@ -28,12 +28,38 @@ def error(bot: Bot, update: Update, error_text: str = 'Command not found .'):
 
 
 def snow_camera(bot: Bot, update: Update):
+    snig_locations = {
+        "Drahobrat": ["драгобрат", "драг"],
+        "Trostyan": ["тростян"],
+        "Pylypets": ["пилипець"],
+        "Bukovel": ["буковель", "бук", "бука"],
+        "Zahar Berkut": ["захар", "захар беркут"],
+        "Plai": ["плай"],
+        "Polytech": ["політех", "політєх"],
+        "Yasinya": ["ясіня"]
+    }
+    selected_location = None
     location = re.sub(r'/[camera|cam]+', '', update.message.text).strip()
-    try:
-        screenshot_location = get_location_snow_camera_screenshot(location=location)
-        bot.send_photo(update.message.chat_id, photo=open(screenshot_location, 'rb'))
-    except Exception:
-        error(bot, update, "Not able to get snow data for location {}".format(location))
+
+    if location not in snig_locations:
+        for en_loc, ukr_locations in snig_locations.items():
+            if location.lower() in ukr_locations:
+                selected_location = en_loc
+                break
+    else:
+        selected_location = location
+
+    if not selected_location:
+        supported_en_locations = ", ".join(snig_locations.keys())
+        error(bot, update,
+              "Location is not supported yet. Supported locations are  {}. "
+              "And their Ukrainian translations".format(supported_en_locations))
+    else:
+        try:
+            screenshot_location = get_location_snow_camera_screenshot(location=selected_location)
+            bot.send_photo(update.message.chat_id, photo=open(screenshot_location, 'rb'))
+        except Exception as e:
+            error(bot, update, "Error. Not able to get snow data for location {}".format(location))
 
 
 def weather(bot: Bot, update: Update):
@@ -107,7 +133,7 @@ def register(dispatcher: Dispatcher):
     # dispatcher.add_handler(CommandHandler(["stream", "st"], get_streams_by_game))
 
     # snow cameras
-    dispatcher.add_error_handler(CommandHandler(["camera", "cam"], snow_camera))
+    dispatcher.add_handler(CommandHandler(["camera", "cam"], snow_camera))
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
     # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)

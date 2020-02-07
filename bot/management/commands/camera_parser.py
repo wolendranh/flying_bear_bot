@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from django.conf import settings
 from selenium.webdriver.support import expected_conditions as EC
 
 from selenium.webdriver.support.wait import WebDriverWait
@@ -12,7 +13,7 @@ options.add_argument('--no-sandbox')
 options.add_argument("--start-maximized")
 options.headless = True
 
-driver = webdriver.Chrome(executable_path='/Users/y.hulpa/PycharmProjects/flying_bear_bot/selenium_drivers/chromedriver', options=options)
+driver = webdriver.Chrome(executable_path=settings.CHROMEDRIVER_PATH, options=options)
 driver.get("https://snig.info/uk")
 
 elem = driver.find_elements_by_xpath("//a[contains(@href, '/uk/{0}') and contains(@class, 'card--object')]".format(location))[0]
