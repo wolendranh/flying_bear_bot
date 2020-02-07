@@ -1,13 +1,14 @@
 import logging
 import re
 
-from telegram.ext import CommandHandler, Filters, MessageHandler, Dispatcher
+from telegram.ext import CommandHandler, Dispatcher
 from telegram import Bot, Update
 
 from .services import (
     get_random_quote_by_tag, get_random_quote, store_quote, get_keyword_quote_count,
-    get_stream_list_by_game, get_weather, get_location_snow_camera_screenshot
+    get_stream_list_by_game, get_weather
 )
+from snow_camera.services.selenium import get_location_snow_camera_screenshot
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +103,8 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler(["weather", "w"], weather))
 
     # twitch
-    dispatcher.add_handler(CommandHandler(["stream", "st"], get_streams_by_game))
+    # not needed for now
+    # dispatcher.add_handler(CommandHandler(["stream", "st"], get_streams_by_game))
 
     # snow cameras
     dispatcher.add_error_handler(CommandHandler(["camera", "cam"], snow_camera))

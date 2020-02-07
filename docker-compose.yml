@@ -1,0 +1,14 @@
+---
+version: "3"
+services:
+  database:
+    image: postgres:12.1-alpine
+    container_name: bot-database
+    environment:
+      POSTGRES_PASSWORD: bot
+      POSTGRES_USER: bot
+      POSTGRES_DB: bot
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./.data/postgres:/var/lib/postgresql/data/
