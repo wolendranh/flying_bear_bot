@@ -11,7 +11,7 @@ class Location(models.Model):
     url_en = models.URLField()
     url_uk = models.URLField(null=True, blank=True)
     synonyms = ArrayField(
-            models.CharField(max_length=30, blank=True), default=list
+            models.CharField(max_length=30, blank=True, null=True), default=list, null=True, blank=True
     )
 
     def __str__(self):
