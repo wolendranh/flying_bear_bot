@@ -24,6 +24,7 @@ class Camera(models.Model):
     location = models.ForeignKey(Location, related_name="cameras", on_delete=models.CASCADE)
     url_en = models.URLField()
     url_uk = models.URLField(null=True, blank=True)
+    cam_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"Camera {self.title_en} for location {self.location}"

@@ -6,6 +6,7 @@ from telegram.ext import CommandHandler, Dispatcher, CallbackQueryHandler
 from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
 
 from snow_camera.models import Location
+from snow_camera.services.camera import camera_handler
 from .services import (
     get_random_quote_by_tag, get_random_quote, store_quote, get_keyword_quote_count,
     get_stream_list_by_game, get_weather
@@ -13,20 +14,6 @@ from .services import (
 from snow_camera.services.selenium import get_location_snow_camera_screenshot
 
 logger = logging.getLogger(__name__)
-
-
-class CallbackQueryHandler:
-
-    def handle(self, query):
-
-        try:
-            return getattr(self, f"{query}_handler")()
-        except AttributeError:
-            raise NotImplementedError("there is no handler defined for requested query.")
-
-
-    def handle(self):
-        pass
 
 
 def help(bot: Bot, update: Update):
@@ -65,7 +52,7 @@ def snow_camera(bot: Bot, update: Update):
               "Location is not supported yet.")
         return
 
-    cameras_map = location_obj.cameras.values_list("title_uk", "id")
+    cameras_map = location_obj.cameras.values_list("title_uk", "cam_id")
 
     button_list = [
         InlineKeyboardButton(camera[0], callback_data=f"cam={camera[1]}")
@@ -136,11 +123,6 @@ def get_streams_by_game(bot: Bot, update: Update):
         logger.exception('Failed to get count for keyword.', exc_info=e)
 
 
-def callback_handler(bot: Bot, update: Update):
-    query = update.callback_query.data
-    print(query)
-
-
 
 def register(dispatcher: Dispatcher):
     """
@@ -154,7 +136,7 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler(["keyword", "k"], random_by_stop_word))
     dispatcher.add_handler(CommandHandler(["count", "c"], quote_count_by_keyword))
     dispatcher.add_handler(CommandHandler(["weather", "w"], weather))
-    dispatcher.add_handler(CallbackQueryHandler(callback_handler))
+    dispatcher.add_handler(CallbackQueryHandler(camera_handler, pattern="^cam=\d+$"))
 
     # twitch
     # not needed for now

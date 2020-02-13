@@ -72,12 +72,15 @@ class SnowLocationParser:
                     camera_data[f"title_{language}"] = ""
                 if href:
                     url = f"{self.root_url}{href}"
+                    cam_id = href.split("/")[-1]
+                    camera_data["cam_id"] = cam_id
                     try:
                         url_en = f"{self.root_url}/{LangCode.EN.value}/{getattr(loc, f'title_{LangCode.EN.value}')}/{url.split('/')[-1]}"
                         url_uk = f"{self.root_url}/{LangCode.UK.value}/{getattr(loc, f'title_{LangCode.UK.value}')}/{url.split('/')[-1]}"
                         camera_obj = Camera.objects.get(Q(url_en=url_en) | Q(url_uk=url_uk))
                         setattr(camera_obj, f"title_{language}", camera_data[f"title_{language}"])
                         setattr(camera_obj, f"url_{language}", url)
+                        setattr(camera_obj, "cam_id", cam_id)
                         camera_obj.save(update_fields=[f"title_{language}", f"url_{language}"])
                     except Camera.DoesNotExist:
                         camera_data[f"url_{language}"] = url

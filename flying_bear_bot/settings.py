@@ -122,8 +122,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+HEROKU = os.environ.get('HEROKU')
 
-if os.environ.get('HEROKU'):
+if HEROKU:
     # Configure Django App for Heroku.
     import django_heroku
     import sentry_sdk
