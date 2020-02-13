@@ -19,7 +19,7 @@ class SnowLocationParser:
     def run(self):
         for lang in [LangCode.EN.value, LangCode.UK.value]:
             location_objects = self.parse_locations(language=lang)
-        # locations = self.parse_cameras(locations=location_objects)
+            self.parse_cameras(locations=location_objects, language=lang)
 
     def _get_soup(self, url: str):
         resp = requests.get(url)
@@ -59,25 +59,28 @@ class SnowLocationParser:
     def parse_cameras(self, locations, language):
         cameras = []
         for loc in locations:
-            soup = self._get_soup(loc.url)
+            soup = self._get_soup(getattr(loc, f"url_{language}"))
             camera_anchors = soup.find_all(class_="card--object")
             for anchor in camera_anchors:
                 href = anchor.attrs.get("href")
                 title = anchor.find(class_="card__info")
                 camera_data = {"location": loc}
                 if title:
-                    title = title.text.encode('windows-1252').decode("utf-8").strip()
-                    camera_data["title_en"] = title
+                    title = title.text.encode("latin1").decode().strip()
+                    camera_data[f"title_{language}"] = title
                 else:
-                    camera_data["title_en"] = ""
+                    camera_data[f"title_{language}"] = ""
                 if href:
                     url = f"{self.root_url}{href}"
                     try:
-                        camera_obj = Location.objects.get(url=url)
-                        camera_obj.title_en = camera_data["title"]
-                        camera_obj.save(update_fields=["title_en"])
-                    except Location.DoesNotExist:
-                        camera_data["url"] = url
+                        url_en = f"{self.root_url}/{LangCode.EN.value}/{getattr(loc, f'title_{LangCode.EN.value}')}/{url.split('/')[-1]}"
+                        url_uk = f"{self.root_url}/{LangCode.UK.value}/{getattr(loc, f'title_{LangCode.UK.value}')}/{url.split('/')[-1]}"
+                        camera_obj = Camera.objects.get(Q(url_en=url_en) | Q(url_uk=url_uk))
+                        setattr(camera_obj, f"title_{language}", camera_data[f"title_{language}"])
+                        setattr(camera_obj, f"url_{language}", url)
+                        camera_obj.save(update_fields=[f"title_{language}", f"url_{language}"])
+                    except Camera.DoesNotExist:
+                        camera_data[f"url_{language}"] = url
                         camera_obj = Camera.objects.create(**camera_data)
                     cameras.append(camera_obj)
         return cameras

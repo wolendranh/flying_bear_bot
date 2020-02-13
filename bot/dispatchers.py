@@ -1,9 +1,11 @@
 import logging
 import re
 
-from telegram.ext import CommandHandler, Dispatcher
-from telegram import Bot, Update
+from django.db.models import Q
+from telegram.ext import CommandHandler, Dispatcher, CallbackQueryHandler
+from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
 
+from snow_camera.models import Location
 from .services import (
     get_random_quote_by_tag, get_random_quote, store_quote, get_keyword_quote_count,
     get_stream_list_by_game, get_weather
@@ -11,6 +13,20 @@ from .services import (
 from snow_camera.services.selenium import get_location_snow_camera_screenshot
 
 logger = logging.getLogger(__name__)
+
+
+class CallbackQueryHandler:
+
+    def handle(self, query):
+
+        try:
+            return getattr(self, f"{query}_handler")()
+        except AttributeError:
+            raise NotImplementedError("there is no handler defined for requested query.")
+
+
+    def handle(self):
+        pass
 
 
 def help(bot: Bot, update: Update):
@@ -27,39 +43,44 @@ def error(bot: Bot, update: Update, error_text: str = 'Command not found .'):
     bot.sendMessage(update.message.chat_id, text=error_text)
 
 
+def build_menu(buttons,
+               n_cols,
+               header_buttons=None,
+               footer_buttons=None):
+    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
+    if header_buttons:
+        menu.insert(0, [header_buttons])
+    if footer_buttons:
+        menu.append([footer_buttons])
+    return menu
+
+
 def snow_camera(bot: Bot, update: Update):
-    snig_locations = {
-        "Drahobrat": ["драгобрат", "драг"],
-        "Trostyan": ["тростян"],
-        "Pylypets": ["пилипець"],
-        "Bukovel": ["буковель", "бук", "бука"],
-        "Zahar Berkut": ["захар", "захар беркут"],
-        "Plai": ["плай"],
-        "Polytech": ["політех", "політєх"],
-        "Yasinya": ["ясіня"]
-    }
-    selected_location = None
-    location = re.sub(r'/[camera|cam]+', '', update.message.text).strip()
+    location = re.sub(r'/[camera|cam]+', '', update.message.text).strip().lower()
 
-    if location not in snig_locations:
-        for en_loc, ukr_locations in snig_locations.items():
-            if location.lower() in ukr_locations:
-                selected_location = en_loc
-                break
-    else:
-        selected_location = location
-
-    if not selected_location:
-        supported_en_locations = ", ".join(snig_locations.keys())
+    try:
+        location_obj = Location.objects.get(Q(title_en__iexact=location) | Q(title_uk__iexact=location))
+    except Location.DoesNotExist:
         error(bot, update,
-              "Location is not supported yet. Supported locations are  {}. "
-              "And their Ukrainian translations".format(supported_en_locations))
-    else:
-        try:
-            screenshot_location = get_location_snow_camera_screenshot(location=selected_location)
-            bot.send_photo(update.message.chat_id, photo=open(screenshot_location, 'rb'))
-        except Exception as e:
-            error(bot, update, "Error. Not able to get snow data for location {}".format(location))
+              "Location is not supported yet.")
+        return
+
+    cameras_map = location_obj.cameras.values_list("title_uk", "id")
+
+    button_list = [
+        InlineKeyboardButton(camera[0], callback_data=f"cam={camera[1]}")
+        for camera in cameras_map
+    ]
+
+    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
+    bot.send_message(chat_id=update.message.chat_id, text="Please select camera", reply_markup=reply_markup)
+
+    #
+    # try:
+    #     screenshot_location = get_location_snow_camera_screenshot(location=selected_location)
+    #     bot.send_photo(update.message.chat_id, photo=open(screenshot_location, 'rb'))
+    # except Exception as e:
+    #     error(bot, update, "Error. Not able to get snow data for location {}".format(location))
 
 
 def weather(bot: Bot, update: Update):
@@ -115,6 +136,12 @@ def get_streams_by_game(bot: Bot, update: Update):
         logger.exception('Failed to get count for keyword.', exc_info=e)
 
 
+def callback_handler(bot: Bot, update: Update):
+    query = update.callback_query.data
+    print(query)
+
+
+
 def register(dispatcher: Dispatcher):
     """
     this method will be called on start of application
@@ -127,6 +154,7 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler(["keyword", "k"], random_by_stop_word))
     dispatcher.add_handler(CommandHandler(["count", "c"], quote_count_by_keyword))
     dispatcher.add_handler(CommandHandler(["weather", "w"], weather))
+    dispatcher.add_handler(CallbackQueryHandler(callback_handler))
 
     # twitch
     # not needed for now
