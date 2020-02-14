@@ -64,7 +64,7 @@ def snow_camera(bot: Bot, update: Update):
 
 
 def snow_camera_gif(bot: Bot, update: Update):
-    location = re.sub(r'/[camera_gif|camg]+', '', update.message.text).strip().lower()
+    location = re.sub(r'/[camera_vid|camv]+', '', update.message.text).strip().lower()
 
     try:
         location_obj = Location.objects.get(Q(title_en__iexact=location) | Q(title_uk__iexact=location))
@@ -76,7 +76,7 @@ def snow_camera_gif(bot: Bot, update: Update):
     cameras_map = location_obj.cameras.values_list("title_uk", "cam_id")
 
     button_list = [
-        InlineKeyboardButton(camera[0], callback_data=f"camg={camera[1]}")
+        InlineKeyboardButton(camera[0], callback_data=f"camv={camera[1]}")
         for camera in cameras_map
     ]
 
@@ -151,7 +151,7 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler(["count", "c"], quote_count_by_keyword))
     dispatcher.add_handler(CommandHandler(["weather", "w"], weather))
     dispatcher.add_handler(CallbackQueryHandler(camera_handler, pattern="^cam=\d+$"))
-    dispatcher.add_handler(CallbackQueryHandler(camera_handler, pattern="^camg=\d+$"))
+    dispatcher.add_handler(CallbackQueryHandler(camera_handler, pattern="^camv=\d+$"))
 
     # twitch
     # not needed for now
@@ -159,7 +159,7 @@ def register(dispatcher: Dispatcher):
 
     # snow cameras
     dispatcher.add_handler(CommandHandler(["camera", "cam"], snow_camera))
-    dispatcher.add_handler(CommandHandler(["camera_gif", "camg"], snow_camera_gif))
+    dispatcher.add_handler(CommandHandler(["camera_gif", "camv"], snow_camera_gif))
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
     # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)

@@ -13,16 +13,16 @@ from snow_camera.models import Camera
 def camera_handler(bot, update):
     query = update.callback_query.data
     screen_type = query.split("=")[0]
-    if screen_type == "camg":
+    if screen_type == "camv":
         gif = True
     else:
         gif = False
     image_location = CameraCallbackQueryHandler()(bot, update, gif=gif)
 
     try:
-        method = "send_animation" if gif else "send_photo"
-        # param = "animation" if gif else "photo"
-        getattr(bot, method)(update.callback_query.message.chat_id, open(image_location, 'rb'))
+        method = "send_video" if gif else "send_photo"
+        kwargs = {"supports_streaming": True} if gif else {}
+        getattr(bot, method)(update.callback_query.message.chat_id, open(image_location, 'rb'), **kwargs)
     except Exception as e:
         bot.sendMessage(update.callback_query.message.chat_id, text="Error. Not able to get snow data for location")
 
@@ -33,14 +33,14 @@ class CameraCallbackQueryHandler:
     BUKOVEL_ROOT_URL = 'https://5c463ef86ff69.streamlock.net:10443/bukovel/'
     FILE_NAME = '/tmp/screen.ts' if settings.HEROKU else "screen.ts"
     IMG_NAME = '/tmp/screen.jpeg' if settings.HEROKU else "screen.jpeg"
-    GIF_NAME = '/tmp/screen.gif' if settings.HEROKU else "screen.gif"
+    SHORT_VIDEO_FILE_NAME = '/tmp/screen-short.mp4' if settings.HEROKU else "screen-short.mp4"
 
     def __call__(self, bot: Bot, update: Update, gif=False, **kwargs):
         query = update.callback_query.data
         cam_id = query.split("=")[1]
         self.handle(cam_id=cam_id, gif=gif)
         if gif:
-            return self.GIF_NAME
+            return self.SHORT_VIDEO_FILE_NAME
         else:
             return self.IMG_NAME
 
@@ -53,7 +53,7 @@ class CameraCallbackQueryHandler:
             stream, playlist = self.url_cam(camera.url_uk)
         self.get_video_file(stream, playlist, self.FILE_NAME)
         if gif:
-            self._get_gif(self.FILE_NAME, self.GIF_NAME)
+            self._get_gif(self.FILE_NAME)
         else:
             self._get_screen(self.FILE_NAME, self.IMG_NAME)
 
@@ -88,10 +88,9 @@ class CameraCallbackQueryHandler:
                     if chunk:
                         f.write(chunk)
 
-    def _get_gif(self, video_file, img_name):
-        clip = (VideoFileClip(video_file)
-                .subclip((0, 0), (0, 2)))
-        clip.write_gif(img_name)
+    def _get_gif(self, video_file):
+        from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+        ffmpeg_extract_subclip(video_file, 0, 5, targetname=self.SHORT_VIDEO_FILE_NAME)
 
     def _get_screen(self, video_file, img_name):
 
