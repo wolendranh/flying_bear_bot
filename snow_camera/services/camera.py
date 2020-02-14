@@ -90,7 +90,7 @@ class CameraCallbackQueryHandler:
 
     def _get_gif(self, video_file, img_name):
         clip = (VideoFileClip(video_file)
-                .subclip((0, 0), (0, 3)))
+                .subclip((0, 0), (0, 2)))
         clip.write_gif(img_name)
 
     def _get_screen(self, video_file, img_name):
