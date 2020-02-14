@@ -62,12 +62,26 @@ def snow_camera(bot: Bot, update: Update):
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
     bot.send_message(chat_id=update.message.chat_id, text="Please select camera", reply_markup=reply_markup)
 
-    #
-    # try:
-    #     screenshot_location = get_location_snow_camera_screenshot(location=selected_location)
-    #     bot.send_photo(update.message.chat_id, photo=open(screenshot_location, 'rb'))
-    # except Exception as e:
-    #     error(bot, update, "Error. Not able to get snow data for location {}".format(location))
+
+def snow_camera_gif(bot: Bot, update: Update):
+    location = re.sub(r'/[camera_gif|camg]+', '', update.message.text).strip().lower()
+
+    try:
+        location_obj = Location.objects.get(Q(title_en__iexact=location) | Q(title_uk__iexact=location))
+    except Location.DoesNotExist:
+        error(bot, update,
+              "Location is not supported yet.")
+        return
+
+    cameras_map = location_obj.cameras.values_list("title_uk", "cam_id")
+
+    button_list = [
+        InlineKeyboardButton(camera[0], callback_data=f"camg={camera[1]}")
+        for camera in cameras_map
+    ]
+
+    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
+    bot.send_message(chat_id=update.message.chat_id, text="Please select camera", reply_markup=reply_markup)
 
 
 def weather(bot: Bot, update: Update):
@@ -137,6 +151,7 @@ def register(dispatcher: Dispatcher):
     dispatcher.add_handler(CommandHandler(["count", "c"], quote_count_by_keyword))
     dispatcher.add_handler(CommandHandler(["weather", "w"], weather))
     dispatcher.add_handler(CallbackQueryHandler(camera_handler, pattern="^cam=\d+$"))
+    dispatcher.add_handler(CallbackQueryHandler(camera_handler, pattern="^camg=\d+$"))
 
     # twitch
     # not needed for now
@@ -144,6 +159,7 @@ def register(dispatcher: Dispatcher):
 
     # snow cameras
     dispatcher.add_handler(CommandHandler(["camera", "cam"], snow_camera))
+    dispatcher.add_handler(CommandHandler(["camera_gif", "camg"], snow_camera_gif))
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
     # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)
