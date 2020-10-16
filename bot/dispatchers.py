@@ -11,9 +11,11 @@ from .services import (
     get_random_quote_by_tag, get_random_quote, store_quote, get_keyword_quote_count,
     get_stream_list_by_game, get_weather
 )
-from snow_camera.services.selenium import get_location_snow_camera_screenshot
 
 logger = logging.getLogger(__name__)
+# for dev env
+# logging.basicConfig(level=logging.DEBUG,
+#                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 def help(bot: Bot, update: Update):
@@ -137,7 +139,6 @@ def get_streams_by_game(bot: Bot, update: Update):
         logger.exception('Failed to get count for keyword.', exc_info=e)
 
 
-
 def register(dispatcher: Dispatcher):
     """
     this method will be called on start of application
@@ -163,4 +164,4 @@ def register(dispatcher: Dispatcher):
 
     # TODO: make this react to messages with some sane timeout, e.g. sent msg from bot not more then 20 in day
     # dispatcher.add_handler(MessageHandler(Filters.text, random_by_stop_word), group=1)
-    dispatcher.add_error_handler(error)
+    # dispatcher.add_error_handler(error)
