@@ -1,0 +1,2 @@
+class CameraTemporaryUnavailable(Exception):
+    pass

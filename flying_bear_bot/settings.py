@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bot',
-    'bot_register'
+    'bot_register',
+    'snow_camera'
 ]
 
 MIDDLEWARE = [
@@ -121,8 +122,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+HEROKU = os.environ.get('HEROKU')
 
-if os.environ.get('HEROKU'):
+if HEROKU:
     # Configure Django App for Heroku.
     import django_heroku
     import sentry_sdk
@@ -141,6 +143,11 @@ if os.environ.get('HEROKU'):
         'register': 'bot.dispatchers.register',
         'webhook': os.environ.get('WEB_HOOK_URL')
     }]
+
+    TWITCH_CLIENT_SECRET = os.environ.get('TWITCH_CLIENT_SECRET')
+    TWITCH_CLIENT_ID = os.environ.get('TWITCH_CLIENT_ID')
+    CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH')
+    GOOGLE_CHROME_BIN = os.environ.get('CHROME_DRIVER_PATH')
 
 try:
     from flying_bear_bot.local_settings import *

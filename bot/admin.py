@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from bot.models import Quote, StopWord
+from bot.models import Quote, Tag
 
 
 class QuoteAdmin(admin.ModelAdmin):
     search_fields = ('text', )
-    list_display = ('text', 'author', 'stop_word')
-    autocomplete_fields = ('stop_word', )
-    list_filter = ('stop_word', 'author', 'text')
+    list_display = ('text', 'author', 'tag')
+    autocomplete_fields = ('tag', )
+    list_filter = ('tag', 'author', 'text')
 
 
 class QuoteInline(admin.TabularInline):
     model = Quote
 
 
-class StopWordAdmin(admin.ModelAdmin):
+class TagAdmin(admin.ModelAdmin):
     search_fields = ('text',)
     inlines = [
         QuoteInline,
@@ -22,4 +22,4 @@ class StopWordAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Quote, QuoteAdmin)
-admin.site.register(StopWord, StopWordAdmin)
+admin.site.register(Tag, TagAdmin)

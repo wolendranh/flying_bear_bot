@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from collections import defaultdict
 
 from django.conf import settings
@@ -25,7 +26,6 @@ class TelegramView(generic.View):
 
         for bot_config in settings.TELEGRAM_BOT:
             bot = Bot(bot_config['token'])
-
             if 'webhook' in bot_config:
                 url = bot_config['webhook'] % bot.token
                 if url[-1] != '/':
@@ -36,8 +36,8 @@ class TelegramView(generic.View):
                 current_site = Site.objects.get_current()
                 url = 'https://' + current_site.domain + webhook
 
+            time.sleep(3)
             bot.set_webhook(url)
-            bot = Bot(bot_config['token'])
             dispatcher = Dispatcher(bot=bot, update_queue=None, workers=0)
             register = import_string(bot_config['register'])
 
