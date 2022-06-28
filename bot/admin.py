@@ -5,9 +5,9 @@ from bot.models import Quote, Tag
 
 class QuoteAdmin(admin.ModelAdmin):
     search_fields = ('text', )
-    list_display = ('text', 'author', 'tag')
+    list_display = ('text', 'author', 'tag', 'created_at')
     autocomplete_fields = ('tag', )
-    list_filter = ('tag', 'author', 'created_at')
+    list_filter = ('created_at', 'tag', 'author')
 
 
 class QuoteInline(admin.TabularInline):
