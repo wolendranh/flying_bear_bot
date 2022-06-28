@@ -32,7 +32,7 @@ kombu==5.2.4
 m3u8==0.5.4
 mccabe==0.6.1
 moviepy==1.0.1
-newrelic==4.12.0.113
+newrelic==7.12.0.176
 numpy==1.22.0
 opencv-python==4.6.0.66
 parso==0.7.1
