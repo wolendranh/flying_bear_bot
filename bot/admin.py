@@ -7,7 +7,7 @@ class QuoteAdmin(admin.ModelAdmin):
     search_fields = ('text', )
     list_display = ('text', 'author', 'tag')
     autocomplete_fields = ('tag', )
-    list_filter = ('tag', 'author', 'text')
+    list_filter = ('tag', 'author', 'created_at')
 
 
 class QuoteInline(admin.TabularInline):

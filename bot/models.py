@@ -16,6 +16,9 @@ class Quote(models.Model):
     author = models.CharField(blank=True, null=True, max_length=100)
     tag = models.ForeignKey(Tag, related_name='quotes', on_delete=models.CASCADE)
 
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+
     def __str__(self):
         return self.text
     
