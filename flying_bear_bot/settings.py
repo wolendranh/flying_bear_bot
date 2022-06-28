@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bot',
     'bot_register',
-    'snow_camera'
+    # 'snow_camera'
 ]
 
 MIDDLEWARE = [
