@@ -1,15 +1,12 @@
 import logging
 import re
 
-from django.db.models import Q
-from telegram.ext import CommandHandler, Dispatcher, CallbackQueryHandler
-from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CommandHandler, Dispatcher, CallbackContext
+from telegram import Bot, Update
 
-# from snow_camera.models import Location
-# from snow_camera.services.camera import camera_handler
 from .services import (
     get_random_quote_by_tag, get_random_quote, store_quote, get_keyword_quote_count,
-    get_stream_list_by_game, get_weather
+    get_stream_list_by_game
 )
 
 logger = logging.getLogger(__name__)
@@ -95,34 +92,34 @@ def build_menu(buttons,
 #         logger.exception('Failed to get weather. Error', exc_info=e)
 
 
-def quote(bot: Bot, update: Update):
+def quote(update: Update, context: CallbackContext):
     try:
         text, author = update.message.reply_to_message.text, update.message.reply_to_message.from_user.full_name
         stripped_stop_word = re.sub(r'/[store|s]+', '', update.message.text).strip()
         if stripped_stop_word:
             store_quote(text=text, author=author, tag_text=stripped_stop_word)
-            bot.sendMessage(update.message.chat_id, text='I stored your quote from {}!'.format(author))
+            context.bot.sendMessage(update.message.chat_id, text='I stored your quote from {}!'.format(author))
         else:
-            bot.sendMessage(update.message.chat_id,
+            context.bot.sendMessage(update.message.chat_id,
                             text='Stop word missing. Please provide stop word text after `/store` command! Thanks!')
     except Exception as e:
         logger.exception('Failed to store quote. Error', exc_info=e)
         
 
-def random_by_stop_word(bot: Bot, update: Update):
+def random_by_stop_word(update: Update, context: CallbackContext):
     quote = get_random_quote_by_tag(message_text=update.message.text)
-    bot.send_message(chat_id=update.message.chat_id, text=quote, parse_mode='HTML')
+    context.bot.send_message(chat_id=update.message.chat_id, text=quote, parse_mode='HTML')
 
 
-def random(bot: Bot, update: Update):
-    bot.send_message(chat_id=update.message.chat_id, text=get_random_quote(), parse_mode='HTML')
+def random(update: Update, context: CallbackContext):
+    context.bot.send_message(chat_id=update.message.chat_id, text=get_random_quote(), parse_mode='HTML')
 
 
-def quote_count_by_keyword(bot: Bot, update: Update):
+def quote_count_by_keyword(update: Update, context: CallbackContext):
     try:
         keyword = re.sub(r'/[count|c]+', "", update.message.text).strip()
         message = get_keyword_quote_count(keyword=keyword)
-        bot.send_message(chat_id=update.message.chat_id, text=message, parse_mode='HTML')
+        context.bot.send_message(chat_id=update.message.chat_id, text=message, parse_mode='HTML')
     except Exception as e:
         logger.exception('Failed to get count for keyword.', exc_info=e)
 

@@ -31,7 +31,7 @@ def get_random_quote():
 
 
 def format_quote(quote: Quote) -> str:
-    return "<i>{}</i>\n{}\n<i>{}</i>".format(quote.text, quote.author or 'Unknown', quote.created_at or '')
+    return "<i>{}</i>\n{}\n<i>{}</i>".format(quote.text, quote.author or 'Unknown', quote.created_at.strftime("%Y-%m-%dT%H-%M") or '')
 
 
 def get_keyword_quote_count(keyword: str) -> str:
